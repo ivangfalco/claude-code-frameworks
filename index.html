@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Claude Code Framework for GTM</title>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T7P7258');</script>
+<!-- End Google Tag Manager -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    /* ColdIQ brand palette — exact hex codes */
+    --blue:    #B4C4FF;
+    --green:   #8DFAB6;
+    --pink:    #F3C6FD;
+    --orange:  #FFAD03;
+    --purple:  #DDCBFF;
+    --teal:    #8DD8F0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #627DFF;
+    color: #000;
+    min-height: 100vh;
+  }
+
+  .page { max-width: 920px; margin: 0 auto; padding: 56px 28px 72px; }
+
+  /* ---- Header ---- */
+  header { text-align: center; margin-bottom: 48px; }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  h1 .accent {
+    color: var(--green);
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ---- Section Dividers ---- */
+  .divider {
+    text-align: center;
+    margin: 48px 0 24px;
+    position: relative;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+  }
+  .divider span {
+    position: relative;
+    padding: 6px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+  }
+
+  /* ---- Tree Block (cards) ---- */
+  .tree-block {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 18px;
+    padding: 32px 28px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 30px rgba(40,60,120,0.12), 0 1px 4px rgba(40,60,120,0.06);
+    overflow-x: auto;
+  }
+
+  .tree-block .block-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 3px;
+  }
+
+  .tree-block .block-desc {
+    font-size: 12.5px;
+    color: #000;
+    margin-bottom: 20px;
+    line-height: 1.55;
+  }
+
+  /* ---- Tree Lines ---- */
+  pre.tree {
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+    color: #000;
+  }
+
+  pre.tree .fi { color: #000; font-weight: 500; }
+
+  pre.tree .a {
+    color: rgba(0,0,0,0.5);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  /* Category highlights — brand colors darkened for readability on white */
+  pre.tree .t1 { color: #7B61C2; font-weight: 700; }  /* governance — purple */
+  pre.tree .t2 { color: #627DFF; font-weight: 700; }  /* gtm ops — blue */
+  pre.tree .t3 { color: #20A060; font-weight: 700; }  /* product — green */
+  pre.tree .t4 { color: #C060B0; font-weight: 700; }  /* personal — pink */
+  pre.tree .t5 { color: #20A060; font-weight: 700; }  /* infra — green */
+  pre.tree .t6 { color: #D09000; font-weight: 700; }  /* safety — orange */
+  pre.tree .th { color: #000;    font-weight: 800; }  /* root */
+
+  /* GTM sub-colors */
+  pre.tree .gp { color: #627DFF; font-weight: 700; }  /* paid — blue */
+  pre.tree .go { color: #C060B0; font-weight: 700; }  /* outbound — pink */
+  pre.tree .gr { color: #D09000; font-weight: 700; }  /* revops — orange */
+  pre.tree .gc { color: #20A060; font-weight: 700; }  /* content — green */
+  pre.tree .ga { color: #2BA8C0; font-weight: 700; }  /* analytics — teal */
+
+  pre.tree .ah {
+    color: #000;
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  /* ---- Visual diagram boxes ---- */
+  .diagram {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    margin: 24px 0 8px;
+    flex-wrap: wrap;
+  }
+
+  .dia-box {
+    padding: 20px 24px;
+    border-radius: 14px;
+    text-align: center;
+    min-width: 160px;
+    flex: 1;
+    max-width: 260px;
+  }
+
+  .dia-box h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 4px;
+  }
+
+  .dia-box p {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #000;
+  }
+
+  .dia-arrow {
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 24px;
+    padding: 0 8px;
+    flex-shrink: 0;
+    font-weight: 300;
+  }
+
+  .dia-know {
+    background: var(--purple);
+  }
+  .dia-exec {
+    background: var(--pink);
+  }
+  .dia-ctx {
+    background: var(--orange);
+  }
+
+  .dia-gov-audit {
+    background: var(--pink);
+  }
+  .dia-gov-propose {
+    background: var(--purple);
+  }
+  .dia-gov-apply {
+    background: var(--green);
+  }
+
+  /* ---- Channel grid ---- */
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0 8px;
+  }
+
+  .ch-card {
+    border-radius: 14px;
+    padding: 18px 10px;
+    text-align: center;
+  }
+
+  .ch-card h5 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 5px;
+  }
+
+  .ch-card p {
+    font-size: 10px;
+    line-height: 1.4;
+    color: #000;
+  }
+
+  .ch-paid {
+    background: var(--blue);
+  }
+  .ch-out {
+    background: var(--pink);
+  }
+  .ch-rev {
+    background: var(--orange);
+  }
+  .ch-con {
+    background: var(--green);
+  }
+  .ch-ana {
+    background: var(--teal);
+  }
+
+  /* ---- Legend ---- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    justify-content: center;
+    margin: 32px 0 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+
+  .ld-purp   { background: var(--purple); }
+  .ld-blue   { background: var(--blue); }
+  .ld-pink   { background: var(--pink); }
+  .ld-orange { background: var(--orange); }
+  .ld-green  { background: var(--green); }
+  .ld-teal   { background: var(--teal); }
+
+  /* ---- Note callout ---- */
+  .note {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 12.5px;
+    color: #000;
+    line-height: 1.6;
+    box-shadow: 0 2px 12px rgba(40,60,120,0.08);
+  }
+
+  .note strong { color: #000; font-weight: 700; }
+
+  /* ---- Footer ---- */
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 20px;
+  }
+
+  .footer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border-radius: 28px;
+    padding: 12px 28px;
+    margin-bottom: 14px;
+  }
+
+  .footer-pill span {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.3px;
+  }
+
+  footer p {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 700px) {
+    .page { padding: 32px 14px 48px; }
+    h1 { font-size: 28px; }
+    pre.tree { font-size: 11px; line-height: 1.65; }
+    .tree-block { padding: 20px 14px; }
+    .channel-grid { grid-template-columns: repeat(3, 1fr); }
+    .diagram { flex-direction: column; align-items: center; gap: 8px; }
+    .dia-arrow { transform: rotate(90deg); padding: 2px 0; }
+  }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T7P7258"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div class="page">
+
+  <header>
+    <div class="badge">Claude Code Framework</div>
+    <h1>How to Structure Claude Code<br>for <span class="accent">GTM Operations</span></h1>
+    <p class="subtitle">The folder architecture, governance layer, knowledge hierarchy, and execution system for running a full go-to-market stack with AI agents.</p>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- LEGEND -->
+  <!-- ============================================ -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot ld-purp"></div>Governance</div>
+    <div class="legend-item"><div class="legend-dot ld-blue"></div>Paid Ads</div>
+    <div class="legend-item"><div class="legend-dot ld-pink"></div>Outbound</div>
+    <div class="legend-item"><div class="legend-dot ld-orange"></div>RevOps</div>
+    <div class="legend-item"><div class="legend-dot ld-green"></div>Content</div>
+    <div class="legend-item"><div class="legend-dot ld-teal"></div>Analytics</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TOP LEVEL -->
+  <!-- ============================================ -->
+  <div class="divider"><span>Top-Level Architecture</span></div>
+
+  <div class="tree-block">
+    <div class="block-title">The Workspace Root</div>
+    <div class="block-desc">Two core projects: one that governs, one that operates. Each is a separate Claude Code context with its own rules, skills, and agents.</div>
+<pre class="tree">
+<span class="th">gtm-workspace/</span>
+├── <span class="t1">governance/</span>                  <span class="a">← The brain. Rules, audits, SOPs, blueprints</span>
+├── <span class="t2">gtm-operations/</span>              <span class="a">← The muscle. Ads, outbound, RevOps, content, analytics</span>
+│
+├── <span class="fi">product/</span>                     <span class="a">← Optional: SaaS tools you're building</span>
+└── <span class="fi">personal/</span>                    <span class="a">← Optional: private coaching, strategy, reflection</span>
+</pre>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SKELETON -->
+  <!-- ============================================ -->
+  <div class="divider"><span>Every Project Has This Skeleton</span></div>
+
+  <div class="tree-block">
+    <div class="block-title">Required Structure (per project)</div>
+    <div class="block-desc">Claude Code reads CLAUDE.md first, auto-loads rules by file path context, and activates skills when a task matches their description.</div>
+<pre class="tree">
+<span class="th">any-project/</span>
+├── <span class="fi">CLAUDE.md</span>                    <span class="a">← <span class="ah">Always loaded.</span> Identity, critical rules, routing table</span>
+├── <span class="t5">.claude/</span>
+│   ├── <span class="t6">rules/</span>                   <span class="a">← <span class="ah">Auto-loaded</span> when working in matching file paths</span>
+│   │   └── <span class="fi">*.md</span>                 <span class="a">   Guardrails, safety constraints, domain rules</span>
+│   ├── <span class="t5">skills/</span>                  <span class="a">← <span class="ah">On-demand.</span> Triggered by task description matching</span>
+│   │   └── <span class="fi">*.md</span>                 <span class="a">   Workflows, strategies, step-by-step procedures</span>
+│   └── <span class="t5">agents/</span>                  <span class="a">← <span class="ah">Subagents.</span> Cheap models for research, review, QA</span>
+│       └── <span class="fi">*.md</span>                 <span class="a">   Each agent = isolated context, single focused task</span>
+└── <span class="fi">MEMORY.md</span>                    <span class="a">← <span class="ah">Always loaded.</span> Evolving state, quick references</span>
+</pre>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- GOVERNANCE -->
+  <!-- ============================================ -->
+  <div class="divider"><span>1 &middot; Governance — The Brain</span></div>
+
+  <!-- Governance Flow Visual -->
+  <div class="diagram">
+    <div class="dia-box dia-gov-audit">
+      <h4>Audit</h4>
+      <p>Scan all projects,<br>flag deviations</p>
+    </div>
+    <div class="dia-arrow">→</div>
+    <div class="dia-box dia-gov-propose">
+      <h4>Propose</h4>
+      <p>File improvements<br>via /feedback</p>
+    </div>
+    <div class="dia-arrow">→</div>
+    <div class="dia-box dia-gov-apply">
+      <h4>Apply</h4>
+      <p>Human confirms,<br>changes go live</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>The governance principle:</strong> Working agents never modify skills, SOPs, or rules directly. They file proposals. Only governance reviews and applies changes after explicit human approval (CONFIRM). This prevents drift and keeps the system consistent.
+  </div>
+
+  <div class="tree-block">
+    <div class="block-title">governance/</div>
+    <div class="block-desc">Doesn't do client work. Governs how every project is structured, audits compliance, holds SOPs, and manages the self-improvement cycle.</div>
+<pre class="tree">
+<span class="t1">governance/</span>
+├── <span class="fi">CLAUDE.md</span>                    <span class="a">← Master rules. Analyze mode (default) vs Execute mode</span>
+├── <span class="t5">.claude/</span>
+│   ├── <span class="t6">rules/</span>
+│   │   └── <span class="fi">governance-rules.md</span>  <span class="a">← Cross-project standards: naming, hierarchy, change control</span>
+│   ├── <span class="t5">skills/</span>
+│   │   ├── <span class="fi">audit.md</span>             <span class="a">← Scan all projects against blueprints, flag deviations</span>
+│   │   ├── <span class="fi">session-end.md</span>       <span class="a">← Capture learnings before closing a session</span>
+│   │   └── <span class="fi">review-proposals.md</span>  <span class="a">← Review improvement proposals filed by other projects</span>
+│   └── <span class="t5">agents/</span>
+│       ├── <span class="fi">researcher.md</span>        <span class="a">← Cheap model, returns concise summaries only</span>
+│       ├── <span class="fi">code-reviewer.md</span>     <span class="a">← No parent context = completely unbiased review</span>
+│       └── <span class="fi">qa-tester.md</span>         <span class="a">← Isolated test execution, keeps output clean</span>
+│
+├── <span class="t1">blueprints/</span>                  <span class="a">← One blueprint per project. Defines expected structure</span>
+│   ├── <span class="fi">gtm-operations-blueprint.md</span>
+│   └── <span class="fi">new-project-template.md</span>
+│
+├── <span class="t1">sops/</span>                        <span class="a">← Standard Operating Procedures (shared across all)</span>
+│   ├── <span class="fi">skill-building-sop.md</span>    <span class="a">   How to build quality skills</span>
+│   ├── <span class="fi">tool-building-sop.md</span>     <span class="a">   How to build composable tools</span>
+│   └── <span class="fi">interaction-sop.md</span>       <span class="a">   How humans should use the system</span>
+│
+├── <span class="t1">registry/</span>                    <span class="a">← Living state that evolves over time</span>
+│   ├── <span class="fi">learnings-log.md</span>         <span class="a">   What AI learned, tagged [PROPOSED] → [APPLIED]</span>
+│   ├── <span class="fi">remaining-todos.md</span>       <span class="a">   Cross-project backlog tracker</span>
+│   └── <span class="t1">proposals/</span>               <span class="a">   Skill improvement proposals filed from working sessions</span>
+│
+├── <span class="t1">research/</span>                    <span class="a">← Decisions archive, audit history, research notes</span>
+└── <span class="t1">checkpoints/</span>                 <span class="a">← Session state snapshots for context handoff</span>
+</pre>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- GTM OPERATIONS - THE STAR -->
+  <!-- ============================================ -->
+  <div class="divider"><span>2 &middot; GTM Operations — The Muscle</span></div>
+
+  <!-- 3-Layer Visual -->
+  <div class="diagram">
+    <div class="dia-box dia-know">
+      <h4>Knowledge</h4>
+      <p>Strategy, methodology,<br>best practices per channel</p>
+    </div>
+    <div class="dia-arrow">→</div>
+    <div class="dia-box dia-exec">
+      <h4>Execution</h4>
+      <p>API bots, scripts,<br>real operations</p>
+    </div>
+    <div class="dia-arrow">→</div>
+    <div class="dia-box dia-ctx">
+      <h4>Context</h4>
+      <p>Per-client data, ICPs,<br>history, deliverables</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>The 3-layer principle:</strong> Strategy never calls APIs. Bots never make strategic decisions. Client data stays isolated per client. Each layer has its own rules file that auto-loads based on which folder you're working in.
+  </div>
+
+  <!-- GTM Channel Coverage -->
+  <div class="channel-grid">
+    <div class="ch-card ch-paid"><h5>Paid Ads</h5><p>LinkedIn, Meta,<br>Google Ads</p></div>
+    <div class="ch-card ch-out"><h5>Outbound</h5><p>Cold email,<br>LinkedIn outreach</p></div>
+    <div class="ch-card ch-rev"><h5>RevOps</h5><p>CRM, pipeline,<br>lead routing</p></div>
+    <div class="ch-card ch-con"><h5>Content</h5><p>Social, SEO,<br>thought leadership</p></div>
+    <div class="ch-card ch-ana"><h5>Analytics</h5><p>Attribution,<br>cross-channel</p></div>
+  </div>
+
+  <!-- GTM Root + Claude infra -->
+  <div class="tree-block">
+    <div class="block-title">gtm-operations/</div>
+    <div class="block-desc">The root. Skills map 1:1 to GTM functions. Rules separate knowledge from execution from client data.</div>
+<pre class="tree">
+<span class="t2">gtm-operations/</span>
+├── <span class="fi">CLAUDE.md</span>                    <span class="a">← Three-layer routing: knowledge / execution / context</span>
+├── <span class="fi">MASTER_SOP.md</span>                <span class="a">← Operating procedures specific to GTM work</span>
+│
+├── <span class="t5">.claude/</span>
+│   ├── <span class="t6">rules/</span>                   <span class="a">← One rule file per architectural layer</span>
+│   │   ├── <span class="fi">knowledge-rules.md</span>   <span class="a">   Strategy layer: methodology only, no live API calls</span>
+│   │   ├── <span class="fi">execution-rules.md</span>   <span class="a">   Bot layer: API safety, credential handling, rate limits</span>
+│   │   └── <span class="fi">clients-rules.md</span>     <span class="a">   Client layer: privacy, isolation, no cross-client data</span>
+│   │
+│   ├── <span class="t5">skills/</span>                  <span class="a">← One skill per GTM function / platform</span>
+│   │   ├── <span class="fi">linkedin-ads.md</span>      <span class="a">   LinkedIn Ads strategy & campaign management</span>
+│   │   ├── <span class="fi">meta-ads.md</span>          <span class="a">   Meta/Facebook Ads & audience targeting</span>
+│   │   ├── <span class="fi">google-ads.md</span>        <span class="a">   Google Ads, keywords, search terms</span>
+│   │   ├── <span class="fi">outbound.md</span>          <span class="a">   Cold email sequences & LinkedIn outreach</span>
+│   │   ├── <span class="fi">revops.md</span>            <span class="a">   CRM ops, pipeline management, lead scoring</span>
+│   │   ├── <span class="fi">content-social.md</span>    <span class="a">   Organic content, social, thought leadership</span>
+│   │   ├── <span class="fi">client-audit.md</span>      <span class="a">   Full cross-channel account audit</span>
+│   │   └── <span class="fi">report-builder.md</span>    <span class="a">   Automated report & doc generation</span>
+│   │
+│   └── <span class="t5">agents/</span>
+│       ├── <span class="fi">researcher.md</span>        <span class="a">   Client research, competitor analysis, market data</span>
+│       └── <span class="fi">code-reviewer.md</span>     <span class="a">   Review bot scripts for API safety & logic</span>
+│
+│
+├── ─── <span class="ah">LAYER 1 · KNOWLEDGE</span> ──────────────────────────────────────
+│
+├── <span class="t2">knowledge/</span>                   <span class="a">← Strategy & methodology. Reads only, never calls APIs</span>
+│   ├── <span class="fi">SKILL.md</span>                 <span class="a">   Master orchestrator — routes to the right subfolder</span>
+│   ├── <span class="fi">CODE_OF_CONDUCT.md</span>       <span class="a">   Behavioral rules for all analytics, audits, reporting</span>
+│   │
+│   ├── <span class="gp">paid-acquisition/</span>        <span class="a">← Paid advertising strategy across platforms</span>
+│   │   ├── <span class="gp">linkedin/</span>
+│   │   │   ├── <span class="fi">SKILL.md</span>
+│   │   │   ├── <span class="gp">knowledge-base/</span>  <span class="a">   ABM, audience sizing, bidding, formats, targeting</span>
+│   │   │   │   └── <span class="fi">*.md</span>         <span class="a">   One file per topic (atomicity principle)</span>
+│   │   │   ├── <span class="gp">methodology/</span>     <span class="a">   Your proprietary frameworks & approaches</span>
+│   │   │   └── <span class="gp">templates/</span>       <span class="a">   Campaign plans, weekly logs, reporting structures</span>
+│   │   ├── <span class="gp">meta/</span>
+│   │   │   ├── <span class="fi">SKILL.md</span>
+│   │   │   └── <span class="gp">knowledge-base/</span>  <span class="a">   Audience strategy, creatives, placements, scaling</span>
+│   │   ├── <span class="gp">google/</span>
+│   │   │   ├── <span class="fi">SKILL.md</span>
+│   │   │   └── <span class="gp">knowledge-base/</span>  <span class="a">   Campaign types, keyword strategy, quality score</span>
+│   │   └── <span class="gp">cross-platform/</span>      <span class="a">   Shared across all paid: personas, budgets, offers</span>
+│   │       ├── <span class="fi">ad-personas.md</span>
+│   │       ├── <span class="fi">budget-allocation.md</span>
+│   │       ├── <span class="fi">channel-selection.md</span>
+│   │       ├── <span class="fi">scaling-framework.md</span>
+│   │       └── <span class="fi">measurement.md</span>
+│   │
+│   ├── <span class="go">outbound/</span>                <span class="a">← Outbound prospecting strategy</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   ├── <span class="go">knowledge-base/</span>
+│   │   │   ├── <span class="fi">cold-email-frameworks.md</span>    <span class="a">  Sequences, subject lines, CTAs</span>
+│   │   │   ├── <span class="fi">linkedin-outreach.md</span>       <span class="a">  Connection requests, InMails, nurture</span>
+│   │   │   ├── <span class="fi">icp-signal-mapping.md</span>      <span class="a">  Intent signals, trigger events, scoring</span>
+│   │   │   └── <span class="fi">list-building.md</span>           <span class="a">  Enrichment, segmentation, hygiene</span>
+│   │   └── <span class="go">templates/</span>           <span class="a">   Sequence templates, cadence plans</span>
+│   │
+│   ├── <span class="gr">revops/</span>                  <span class="a">← Revenue operations strategy</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="gr">knowledge-base/</span>
+│   │       ├── <span class="fi">pipeline-stages.md</span>         <span class="a">  Stage definitions, exit criteria, SLAs</span>
+│   │       ├── <span class="fi">lead-scoring.md</span>            <span class="a">  Scoring models, MQL/SQL criteria</span>
+│   │       ├── <span class="fi">lead-routing.md</span>            <span class="a">  Assignment rules, round-robin, territory</span>
+│   │       ├── <span class="fi">attribution-models.md</span>      <span class="a">  Multi-touch, first/last click, weighted</span>
+│   │       └── <span class="fi">lifecycle-definitions.md</span>   <span class="a">  Lead → MQL → SQL → Opp → Customer</span>
+│   │
+│   ├── <span class="gc">content/</span>                 <span class="a">← Content & organic strategy</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="gc">knowledge-base/</span>
+│   │       ├── <span class="fi">content-pillars.md</span>         <span class="a">  Topics, formats, distribution channels</span>
+│   │       ├── <span class="fi">social-playbook.md</span>         <span class="a">  LinkedIn organic, Twitter/X, engagement</span>
+│   │       ├── <span class="fi">seo-strategy.md</span>            <span class="a">  Keywords, clusters, technical SEO</span>
+│   │       └── <span class="fi">thought-leadership.md</span>      <span class="a">  POV development, authority building</span>
+│   │
+│   └── <span class="ga">analytics/</span>               <span class="a">← Cross-channel measurement & reporting</span>
+│       ├── <span class="fi">SKILL.md</span>
+│       └── <span class="ga">knowledge-base/</span>
+│           ├── <span class="fi">kpi-definitions.md</span>         <span class="a">  North star, leading/lagging indicators</span>
+│           ├── <span class="fi">reporting-cadence.md</span>       <span class="a">  Weekly, monthly, quarterly rhythms</span>
+│           ├── <span class="fi">dashboard-specs.md</span>         <span class="a">  What to track, where, data sources</span>
+│           └── <span class="fi">benchmarks.md</span>              <span class="a">  Industry/channel benchmarks by stage</span>
+│
+│
+├── ─── <span class="ah">LAYER 2 · EXECUTION</span> ──────────────────────────────────────
+│
+├── <span class="t2">execution/</span>                   <span class="a">← API bots & scripts. Real operations happen here</span>
+│   │
+│   ├── <span class="gp">linkedin-bot/</span>            <span class="a">← LinkedIn Marketing API</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   ├── <span class="fi">API_REFERENCE.md</span>     <span class="a">   Endpoints, auth, rate limits, gotchas</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Campaign CRUD, analytics, creatives, attribution</span>
+│   │
+│   ├── <span class="gp">meta-bot/</span>                <span class="a">← Meta Marketing API</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   ├── <span class="fi">API_REFERENCE.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Audiences, campaigns, ad creation, placements</span>
+│   │
+│   ├── <span class="gp">google-ads-bot/</span>          <span class="a">← Google Ads API</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Campaigns, keywords, search terms, bidding</span>
+│   │
+│   ├── <span class="go">email-sequencer-bot/</span>     <span class="a">← Outbound email tooling (Instantly, Smartlead, etc.)</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   ├── <span class="fi">API_REFERENCE.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Sequence management, warmup, deliverability</span>
+│   │
+│   ├── <span class="go">linkedin-outreach-bot/</span>   <span class="a">← LinkedIn outreach automation</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Connection requests, follow-ups, messaging</span>
+│   │
+│   ├── <span class="go">enrichment-bot/</span>          <span class="a">← Data enrichment (Clay, Apollo, Clearbit, etc.)</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   List building, contact enrichment, signals</span>
+│   │
+│   ├── <span class="gr">crm-bot/</span>                 <span class="a">← CRM integration (HubSpot, Salesforce, Attio, etc.)</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   ├── <span class="fi">API_REFERENCE.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Contact sync, pipeline updates, deal tracking</span>
+│   │
+│   ├── <span class="ga">reporting-bot/</span>           <span class="a">← Automated report & doc generation</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Google Docs, Sheets, PDF generation, formatting</span>
+│   │
+│   ├── <span class="ga">tag-manager-bot/</span>         <span class="a">← Tracking & tag management (GTM, etc.)</span>
+│   │   ├── <span class="fi">SKILL.md</span>
+│   │   └── <span class="fi">*.py</span>                 <span class="a">   Tag creation, triggers, conversion tracking</span>
+│   │
+│   └── <span class="ga">analytics-bot/</span>           <span class="a">← Cross-platform unified analytics</span>
+│       ├── <span class="fi">SKILL.md</span>
+│       └── <span class="fi">*.py</span>                 <span class="a">   Pull data across all platforms, normalize, compare</span>
+│
+│
+├── ─── <span class="ah">LAYER 3 · CLIENT CONTEXT</span> ──────────────────────────────────
+│
+└── <span class="t2">clients/</span>                     <span class="a">← Per-client data. Completely isolated from each other</span>
+    ├── <span class="t2">client-a/</span>
+    │   ├── <span class="fi">KNOWLEDGE_BASE.md</span>    <span class="a">   ICP, positioning, pain points, account IDs</span>
+    │   ├── <span class="fi">LINKS.md</span>             <span class="a">   External links (Drive, dashboards, portals, Slack)</span>
+    │   ├── <span class="fi">changelog.md</span>         <span class="a">   Running log of changes, decisions, actions</span>
+    │   ├── <span class="t2">docs/</span>                <span class="a">   Reports, proposals, deliverables, SOPs</span>
+    │   ├── <span class="t2">notes/</span>               <span class="a">   Call notes, meeting agendas, open items</span>
+    │   ├── <span class="t2">audits/</span>              <span class="a">   Account audit snapshots & findings</span>
+    │   └── <span class="t2">scripts/</span>             <span class="a">   Client-specific automation scripts</span>
+    │
+    ├── <span class="t2">client-b/</span>                <span class="a">   Same structure, same isolation</span>
+    └── <span class="t2">client-c/</span>
+</pre>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- GLOBAL CONFIG -->
+  <!-- ============================================ -->
+  <div class="divider"><span>3 &middot; Global Config — Safety &amp; Shared Skills</span></div>
+
+  <div class="tree-block">
+    <div class="block-title">~/.claude/</div>
+    <div class="block-desc">System-level settings that apply across every project. Hooks enforce safety before any tool runs. Global skills are available from anywhere.</div>
+<pre class="tree">
+<span class="t5">~/.claude/</span>
+├── <span class="fi">settings.json</span>                <span class="a">← Hooks, status line, permissions</span>
+│   <span class="a">  hooks:</span>
+│   <span class="a">    ├── PreToolUse         → Block destructive commands (rm -rf, force push, DROP)</span>
+│   <span class="a">    ├── PreCompact          → Warn to checkpoint before auto-compaction</span>
+│   <span class="a">    └── SessionStart        → Remind master rules after compaction</span>
+│
+├── <span class="t5">skills/</span>                      <span class="a">← Global skills (available from any project)</span>
+│   ├── <span class="t5">checkpoint/</span>
+│   │   └── <span class="fi">SKILL.md</span>             <span class="a">   Save session state before switching contexts</span>
+│   └── <span class="t5">feedback/</span>
+│       └── <span class="fi">SKILL.md</span>             <span class="a">   File improvement proposals from any project</span>
+│
+└── <span class="t5">projects/</span>                    <span class="a">← Per-project persistent memory (auto-managed)</span>
+    └── <span class="fi">*/memory/MEMORY.md</span>       <span class="a">   Evolving state, quick refs, survives across sessions</span>
+</pre>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- HOW IT CONNECTS -->
+  <!-- ============================================ -->
+  <div class="divider"><span>How It All Connects</span></div>
+
+  <div class="tree-block">
+    <div class="block-title">Knowledge Hierarchy — What Gets Loaded When</div>
+    <div class="block-desc">Not everything loads at once. The system is tiered — critical context is always present, everything else loads only when needed.</div>
+<pre class="tree">
+<span class="ah">Tier 1</span>  │ <span class="t1">CLAUDE.md</span>                <span class="a">Always loaded. Identity + critical rules + routing.</span>
+<span class="ah">Tier 2</span>  │ <span class="t6">.claude/rules/</span>           <span class="a">Auto-loaded when you touch matching file paths.</span>
+<span class="ah">Tier 3</span>  │ <span class="t5">.claude/skills/</span>          <span class="a">On-demand. Activated when task matches skill description.</span>
+<span class="ah">Tier 4</span>  │ <span class="t2">knowledge-base/ + SOPs</span>   <span class="a">Referenced by skills. Deep methodology, how-to guides.</span>
+<span class="ah">Tier 5</span>  │ <span class="t5">MEMORY.md</span>                <span class="a">Always loaded. Quick lookups, evolving state.</span>
+</pre>
+  </div>
+
+  <div class="tree-block">
+    <div class="block-title">Self-Improvement Feedback Loop</div>
+    <div class="block-desc">The system learns from every working session. Corrections and preferences get captured as structured proposals, reviewed weekly, and applied across the ecosystem.</div>
+<pre class="tree">
+<span class="t2">Working session</span>  ──→  <span class="fi">/feedback</span>  ──→  <span class="t1">governance/registry/proposals/</span>
+                                              │
+                                      <span class="fi">/review-proposals</span>  ←── weekly
+                                              │
+                                        <span class="t6">Human approves</span>  (CONFIRM)
+                                              │
+                                      <span class="t1">Governance applies changes</span> across all projects
+                                              │
+                                      <span class="t5">registry/learnings-log.md</span>  ←── captured
+</pre>
+  </div>
+
+  <div class="tree-block">
+    <div class="block-title">Change Control — What Can Be Modified and How</div>
+    <div class="block-desc">Not all files are equal. Constitutional files require explicit human approval. Working knowledge is freely mutable by the AI during sessions.</div>
+<pre class="tree">
+<span class="t6">Constitutional</span>   │ CLAUDE.md, SOPs, governance rules    <span class="a">← Requires explicit CONFIRM</span>
+<span class="t1">Structural</span>       │ Skills, rules, agent definitions      <span class="a">← Via /feedback → review cycle</span>
+<span class="t5">Working</span>          │ MEMORY.md, client data, learnings     <span class="a">← Freely mutable during sessions</span>
+</pre>
+  </div>
+
+  <footer>
+    <div class="footer-pill">
+      <span>Ivan Falco  |  coldiq.com</span>
+    </div>
+    <p>
+      A governance-first framework for running GTM operations with Claude Code.<br>
+      Knowledge hierarchies, specialized agents, execution bots, and self-improving feedback loops.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
