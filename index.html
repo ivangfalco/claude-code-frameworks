@@ -353,14 +353,51 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     line-height: 1.8;
   }
 
-  @media (max-width: 700px) {
-    .page { padding: 32px 14px 48px; }
-    h1 { font-size: 28px; }
-    pre.tree { font-size: 11px; line-height: 1.65; }
-    .tree-block { padding: 20px 14px; }
+  /* Tablet */
+  @media (max-width: 768px) {
+    .page { padding: 40px 18px 56px; }
+    h1 { font-size: 30px; letter-spacing: -1px; }
+    .subtitle { font-size: 14px; }
     .channel-grid { grid-template-columns: repeat(3, 1fr); }
-    .diagram { flex-direction: column; align-items: center; gap: 8px; }
-    .dia-arrow { transform: rotate(90deg); padding: 2px 0; }
+    .tree-block { padding: 24px 18px; }
+    pre.tree { font-size: 12px; }
+    .dia-box { min-width: 120px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 520px) {
+    .page { padding: 28px 12px 40px; }
+    h1 { font-size: 24px; letter-spacing: -0.8px; }
+    h1 br { display: none; }
+    .subtitle { font-size: 13px; }
+    .badge { font-size: 9px; padding: 5px 12px; }
+    .divider { margin: 36px 0 18px; }
+    .divider span { font-size: 10px; letter-spacing: 1.2px; padding: 5px 14px; }
+
+    .tree-block { padding: 18px 12px; border-radius: 14px; }
+    .tree-block .block-title { font-size: 14px; }
+    .tree-block .block-desc { font-size: 11.5px; }
+
+    pre.tree { font-size: 10px; line-height: 1.6; }
+    pre.tree .a { display: none; }
+
+    .diagram { flex-direction: column; align-items: stretch; gap: 0; }
+    .dia-box { max-width: 100%; min-width: auto; padding: 16px 20px; border-radius: 12px; }
+    .dia-arrow { transform: rotate(90deg); padding: 4px 0; font-size: 20px; justify-content: center; }
+
+    .channel-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .ch-card { padding: 14px 8px; border-radius: 12px; }
+    .ch-card h5 { font-size: 11px; }
+    .ch-card p { font-size: 9.5px; }
+
+    .legend { gap: 8px 14px; margin: 24px 0 8px; }
+    .legend-item { font-size: 10.5px; }
+
+    .note { padding: 14px 16px; font-size: 11.5px; border-radius: 12px; }
+
+    .footer-pill { padding: 10px 20px; }
+    .footer-pill span { font-size: 12px; }
+    footer p { font-size: 10.5px; }
   }
 </style>
 </head>
